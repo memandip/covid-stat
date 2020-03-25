@@ -4,7 +4,6 @@
 
 .recharts-wrapper {
   margin: 0 auto;
-  margin-top: 30px;
 }
 
 .card-title {
@@ -12,12 +11,23 @@
   margin-bottom: 0;
 }
 
-.card-body{
+.card-body {
   padding: 1rem;
 }
 
-body{
+body {
   background: #8080801f;
   max-height: 100vh;
   overflow: hidden;
+}
+
+#map {
+  width: 100%;
+  height: 91vh;
+}
+
+#map g path {
+  stroke-width: 1;
+  stroke: #000;
+  fill: khaki;
 }
