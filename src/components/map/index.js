@@ -1,21 +1,60 @@
 import React, { Component } from 'react'
-import { Row, Col } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import geojson from './geo.json'
+import { countryDetail } from '../../apiUrls'
+import Loader from '../../Loader'
 
 export default class Map extends Component {
 
+    state = {
+        marker: null,
+        map: null,
+        iso3: null,
+        selectedCountry: null,
+        data: null,
+        loading: false,
+        showModal: false
+    }
+
     componentDidMount() {
-        let map = L.map('map').setView([39.74739, -105], 4),
+        let map = L.map('map').setView([39.74739, -105], 3),
             style = {
                 stroke: true,
                 fill: true,
                 fillOpacity: 1
-            }
+            },
+            myIcon = L.icon({
+                iconUrl: '/map-marker.png',
+                iconSize: [38, 38],
+                iconAnchor: [22, 42],
+                popupAnchor: [0, 0]
+            })
 
         map.panTo(new L.latLng(27.6711212, 85.3446311))
-        L.geoJson(geojson, { clickable: true }).addTo(map)
+        L.geoJson(geojson, {
+            clickable: true,
+            onEachFeature: function (feature, latlng) {
+                // console.log('feature', feature)
+                // L.marker(latlng,{icon: myIcon})
+            }
+        })
+            .bindPopup(layer => {
+                this.setState({ iso3: layer.feature.properties.iso_a3, selectedCountry: layer.feature.properties.admin })
+                return layer.feature.properties.admin
+            })
+            .addTo(map)
+
+        // map.on('click', e => {
+        //     if (this.state.marker) {
+        //         map.removeLayer(this.state.marker)
+        //     }
+        //     let marker = L.marker(e.latlng, { icon: myIcon }).addTo(map)
+        //     this.setState({ marker })
+        // })
+
+        this.setState({ map })
 
         // markers = L.markerClusterGroup()
 
@@ -53,9 +92,45 @@ export default class Map extends Component {
         // })
     }
 
+    async componentDidUpdate(prevProps, presState) {
+        if (presState.iso3 !== this.state.iso3) {
+            this.setState({ loading: true })
+            let data = await fetch(countryDetail.replace(/COUNTRY/, this.state.iso3)).then(res => res.json())
+            this.setState({ data, loading: false, showModal: true })
+        }
+    }
+
     render() {
+        let data = this.state.data || {}
+        const { confirmed, recovered, deaths } = data
         return (
-            <div id="map"></div>
+            <>
+                {this.state.loading && <Loader />}
+                <div id="map"></div>
+                {this.state.showModal && (
+                    <Modal show={this.state.showModal} onHide={_ => this.setState({ showModal: false })}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{this.state.selectedCountry}</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <ul className="list-unstyled">
+                                <li className="label label-warning">
+                                    <strong>Total Confirmed: </strong>&nbsp;
+                                    {confirmed.value}
+                                </li>
+                                <li className="label label-success">
+                                    <strong>Total Recovered: </strong>&nbsp;
+                                    {recovered.value}
+                                </li>
+                                <li className="label label-danger">
+                                    <strong>Total Deaths: </strong>&nbsp;
+                                    {deaths.value}
+                                </li>
+                            </ul>
+                        </Modal.Body>
+                    </Modal>
+                )}
+            </>
         )
     }
 }
