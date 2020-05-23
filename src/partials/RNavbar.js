@@ -8,8 +8,8 @@ const RNavbar = () => (
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
-                <NavLink className='nav-link' to="/">Dashboard</NavLink>
-                <NavLink className='nav-link' to="/map">Map</NavLink>
+                <NavLink className='nav-link' to="/covid-stat/">Dashboard</NavLink>
+                <NavLink className='nav-link' to="/covid-stat/map">Map</NavLink>
             </Nav>
         </Navbar.Collapse>
     </Navbar>

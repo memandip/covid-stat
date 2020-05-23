@@ -15,8 +15,8 @@ function App() {
 		<Router>
 			<RNavbar />
 			<Switch>
-				<Route path="/" exact={true} component={Dashboard} />
-				<Route path="/map" exact={true} component={Map} />
+				<Route path="/covid-stat/" exact={true} component={Dashboard} />
+				<Route path="/covid-stat/map" exact={true} component={Map} />
 			</Switch>
 		</Router>
 	)
