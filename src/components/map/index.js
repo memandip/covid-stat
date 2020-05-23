@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import geojson from './geo.json'
@@ -19,31 +19,40 @@ export default class Map extends Component {
     }
 
     componentDidMount() {
-        let map = L.map('map').setView([39.74739, -105], 3),
-            style = {
-                stroke: true,
-                fill: true,
-                fillOpacity: 1
-            },
-            myIcon = L.icon({
-                iconUrl: '/map-marker.png',
-                iconSize: [38, 38],
-                iconAnchor: [22, 42],
-                popupAnchor: [0, 0]
-            })
+        let map = L.map('map').setView([39.74739, -105], 3)
+            // style = {
+            //     stroke: true,
+            //     fill: true,
+            //     fillOpacity: 1
+            // },
+            // myIcon = L.icon({
+            //     iconUrl: '/map-marker.png',
+            //     iconSize: [38, 38],
+            //     iconAnchor: [22, 42],
+            //     popupAnchor: [0, 0]
+            // })
 
         map.panTo(new L.latLng(27.6711212, 85.3446311))
         L.geoJson(geojson, {
             clickable: true,
-            onEachFeature: function (feature, latlng) {
-                // console.log('feature', feature)
-                // L.marker(latlng,{icon: myIcon})
+            onEachFeature: (feature, layer) => {
+                layer.on('click', async _ => {
+                    let {admin, iso_a3} = layer.feature.properties
+                    if(this.state.data && this.state.selectedCountry === admin){
+                        this.setState({showModal: true})
+                        return
+                    }
+                    this.setState({ loading: true })
+                    let data = await fetch(countryDetail.replace(/COUNTRY/, iso_a3)).then(res => res.json())
+                    this.setState({ data, loading: false, showModal: true })
+                    this.setState({ iso3: iso_a3, selectedCountry: admin })
+                })
             }
         })
-            .bindPopup(layer => {
-                this.setState({ iso3: layer.feature.properties.iso_a3, selectedCountry: layer.feature.properties.admin })
-                return layer.feature.properties.admin
-            })
+            // .bindPopup(layer => {
+            //     this.setState({ iso3: layer.feature.properties.iso_a3, selectedCountry: layer.feature.properties.admin })
+            //     return layer.feature.properties.admin
+            // })
             .addTo(map)
 
         // map.on('click', e => {
@@ -90,14 +99,6 @@ export default class Map extends Component {
         // map.on('click', function(e){
         //     console.log('e', e)
         // })
-    }
-
-    async componentDidUpdate(prevProps, presState) {
-        if (presState.iso3 !== this.state.iso3) {
-            this.setState({ loading: true })
-            let data = await fetch(countryDetail.replace(/COUNTRY/, this.state.iso3)).then(res => res.json())
-            this.setState({ data, loading: false, showModal: true })
-        }
     }
 
     render() {
