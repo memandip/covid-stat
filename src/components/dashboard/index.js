@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap'
 import RCard from '../../partials/RCard'
 import CovidPieChart from './CovidPieChart'
 import { mainApi } from '../../apiUrls'
+import { formatNumberNp, getColors } from '../../helpers'
 
 export default class Dashboard extends Component {
 
@@ -16,33 +17,31 @@ export default class Dashboard extends Component {
             .then(data => this.setState({ data }))
     }
 
-    formatNumber = number => new Intl.NumberFormat('en-IN').format(number)
-
     render() {
         let { data } = this.state,
-            COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#eb4034']
+            COLORS = getColors()
         return (
             <Container>
                 {data && (
                     <Row>
                         <Col>
                             <RCard title='Total Cases'
-                                value={this.formatNumber(data.confirmed.value)}
+                                value={formatNumberNp(data.confirmed.value)}
                                 color={COLORS[0]} />
                         </Col>
                         <Col>
                             <RCard title='Active Cases'
-                                value={this.formatNumber(data.confirmed.value - (data.deaths.value + data.recovered.value))}
+                                value={formatNumberNp(data.confirmed.value - (data.deaths.value + data.recovered.value))}
                                 color={COLORS[1]} />
                         </Col>
                         <Col>
                             <RCard title='Recovered'
-                                value={this.formatNumber(data.recovered.value)}
+                                value={formatNumberNp(data.recovered.value)}
                                 color={COLORS[2]} />
                         </Col>
                         <Col>
                             <RCard title='Deaths'
-                                value={this.formatNumber(data.deaths.value)}
+                                value={formatNumberNp(data.deaths.value)}
                                 color={COLORS[3]} />
                         </Col>
                     </Row>

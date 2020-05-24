@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { PieChart, Pie, Cell } from 'recharts'
+import { getColors } from '../../helpers'
 
 export default class CovidPieChart extends Component {
 
@@ -17,7 +18,7 @@ export default class CovidPieChart extends Component {
     }
 
     render() {
-        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#eb4034']
+        const COLORS = getColors()
         let { confirmed, recovered, deaths } = this.props.data
         let data = [
             { name: 'Active Cases', value: (confirmed.value - (recovered.value + deaths.value)) },

@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import geojson from './geo.json'
 import { countryDetail } from '../../apiUrls'
 import Loader from '../../Loader'
+import { formatNumberNp } from '../../helpers'
 
 export default class Map extends Component {
 
@@ -41,17 +42,12 @@ export default class Map extends Component {
                 layer.on('click', async e => {
                     let { admin, iso_a3 } = layer.feature.properties
 
-                    map.fitBounds(layer.getBounds())
+                    if (this.state.marker) map.removeLayer(this.state.marker)
 
-                    if (this.state.selectedCountry !== admin) {
-                        this.setState({ selectedCountry: admin })
-                        if (this.state.marker) {
-                            map.removeLayer(this.state.marker)
-                        }
-                        let marker = L.marker(e.latlng, { icon: myIcon }).addTo(map)
-                        marker.bindTooltip(admin).openTooltip()
-                        this.setState({marker})
-                    }
+                    map.fitBounds(layer.getBounds())
+                    let marker = L.marker(e.latlng, { icon: myIcon }).addTo(map)
+                    marker.bindTooltip(admin).openTooltip()
+                    this.setState({ marker, selectedCountry: admin })
 
                     if (this.state.fetchedData && this.state.fetchedData[iso_a3]) {
                         this.setState({ data: this.state.fetchedData[iso_a3], showModal: true })
@@ -62,11 +58,11 @@ export default class Map extends Component {
                     let data = await fetch(countryDetail.replace(/COUNTRY/, iso_a3)).then(res => res.json()),
                         { fetchedData } = this.state
 
-                    if(data.error){
-                        this.setState({loading: false})
+                    if (data.error) {
+                        this.setState({ loading: false })
                         alert(`No data available for ${admin}.`)
                         return
-                    }    
+                    }
 
                     fetchedData[iso_a3] = data
 
@@ -148,15 +144,15 @@ export default class Map extends Component {
                             <ul className="list-unstyled">
                                 <li className="label label-warning">
                                     <strong>Total Confirmed: </strong>&nbsp;
-                                    {confirmed.value}
+                                    {formatNumberNp(confirmed.value)}
                                 </li>
                                 <li className="label label-success">
                                     <strong>Total Recovered: </strong>&nbsp;
-                                    {recovered.value}
+                                    {formatNumberNp(recovered.value)}
                                 </li>
                                 <li className="label label-danger">
                                     <strong>Total Deaths: </strong>&nbsp;
-                                    {deaths.value}
+                                    {formatNumberNp(deaths.value)}
                                 </li>
                             </ul>
                         </Modal.Body>
