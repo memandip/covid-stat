@@ -6,6 +6,7 @@ import geojson from './geo.json'
 import { countryDetail } from '../../apiUrls'
 import Loader from '../../Loader'
 import { formatNumberNp } from '../../helpers'
+import mapMarker from './map-marker.png'
 
 export default class Map extends Component {
 
@@ -23,7 +24,7 @@ export default class Map extends Component {
     componentDidMount() {
         let map = L.map('map').setView([39.74739, -105], 3),
             myIcon = L.icon({
-                iconUrl: '/map-marker.png',
+                iconUrl: mapMarker,
                 iconSize: [38, 38],
                 iconAnchor: [22, 42],
                 popupAnchor: [0, 0]
