@@ -15,37 +15,68 @@ export default class Map extends Component {
         selectedCountry: null,
         data: null,
         loading: false,
-        showModal: false
+        showModal: false,
+        fetchedData: {}
     }
 
     componentDidMount() {
-        let map = L.map('map').setView([39.74739, -105], 3)
-            // style = {
-            //     stroke: true,
-            //     fill: true,
-            //     fillOpacity: 1
-            // },
-            // myIcon = L.icon({
-            //     iconUrl: '/map-marker.png',
-            //     iconSize: [38, 38],
-            //     iconAnchor: [22, 42],
-            //     popupAnchor: [0, 0]
-            // })
+        let map = L.map('map').setView([39.74739, -105], 3),
+            myIcon = L.icon({
+                iconUrl: '/map-marker.png',
+                iconSize: [38, 38],
+                iconAnchor: [22, 42],
+                popupAnchor: [0, 0]
+            })
+        // style = {
+        //     stroke: true,
+        //     fill: true,
+        //     fillOpacity: 1
+        // }
 
         map.panTo(new L.latLng(27.6711212, 85.3446311))
         L.geoJson(geojson, {
             clickable: true,
             onEachFeature: (feature, layer) => {
-                layer.on('click', async _ => {
-                    let {admin, iso_a3} = layer.feature.properties
-                    if(this.state.data && this.state.selectedCountry === admin){
-                        this.setState({showModal: true})
+
+                layer.on('click', async e => {
+                    let { admin, iso_a3 } = layer.feature.properties
+
+                    map.fitBounds(layer.getBounds())
+
+                    if (this.state.selectedCountry !== admin) {
+                        this.setState({ selectedCountry: admin })
+                        if (this.state.marker) {
+                            map.removeLayer(this.state.marker)
+                        }
+                        let marker = L.marker(e.latlng, { icon: myIcon }).addTo(map)
+                        marker.bindTooltip(admin).openTooltip()
+                        this.setState({marker})
+                    }
+
+                    if (this.state.fetchedData && this.state.fetchedData[iso_a3]) {
+                        this.setState({ data: this.state.fetchedData[iso_a3], showModal: true })
                         return
                     }
+
                     this.setState({ loading: true })
-                    let data = await fetch(countryDetail.replace(/COUNTRY/, iso_a3)).then(res => res.json())
-                    this.setState({ data, loading: false, showModal: true })
-                    this.setState({ iso3: iso_a3, selectedCountry: admin })
+                    let data = await fetch(countryDetail.replace(/COUNTRY/, iso_a3)).then(res => res.json()),
+                        { fetchedData } = this.state
+
+                    if(data.error){
+                        this.setState({loading: false})
+                        alert(`No data available for ${admin}.`)
+                        return
+                    }    
+
+                    fetchedData[iso_a3] = data
+
+                    this.setState({
+                        data,
+                        fetchedData,
+                        loading: false,
+                        showModal: true,
+                        iso3: iso_a3
+                    })
                 })
             }
         })

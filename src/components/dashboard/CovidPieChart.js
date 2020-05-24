@@ -17,7 +17,7 @@ export default class CovidPieChart extends Component {
     }
 
     render() {
-        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#eb4034']
         let { confirmed, recovered, deaths } = this.props.data
         let data = [
             { name: 'Active Cases', value: (confirmed.value - (recovered.value + deaths.value)) },
@@ -33,6 +33,7 @@ export default class CovidPieChart extends Component {
                     outerRadius={150}
                     fill="#8884d8"
                     dataKey="value"
+                    label={this.renderCustomizedLabel}
                 >
                     {
                         data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index+1]} />)

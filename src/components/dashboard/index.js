@@ -16,31 +16,33 @@ export default class Dashboard extends Component {
             .then(data => this.setState({ data }))
     }
 
+    formatNumber = number => new Intl.NumberFormat('en-IN').format(number)
+
     render() {
         let { data } = this.state,
-            COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+            COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#eb4034']
         return (
             <Container>
                 {data && (
                     <Row>
                         <Col>
                             <RCard title='Total Cases'
-                                value={data.confirmed.value}
+                                value={this.formatNumber(data.confirmed.value)}
                                 color={COLORS[0]} />
                         </Col>
                         <Col>
                             <RCard title='Active Cases'
-                                value={data.confirmed.value - (data.deaths.value + data.recovered.value)}
+                                value={this.formatNumber(data.confirmed.value - (data.deaths.value + data.recovered.value))}
                                 color={COLORS[1]} />
                         </Col>
                         <Col>
                             <RCard title='Recovered'
-                                value={data.recovered.value}
+                                value={this.formatNumber(data.recovered.value)}
                                 color={COLORS[2]} />
                         </Col>
                         <Col>
                             <RCard title='Deaths'
-                                value={data.deaths.value}
+                                value={this.formatNumber(data.deaths.value)}
                                 color={COLORS[3]} />
                         </Col>
                     </Row>
