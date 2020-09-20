@@ -34,3 +34,7 @@ code {
 .preloader span{
   margin: 0 auto;
 }
+
+path.recharts-curve.recharts-pie-label-line {
+  display: none;
+}

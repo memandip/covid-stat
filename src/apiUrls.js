@@ -15,6 +15,3 @@ export const image = 'https://covid19.mathdro.id/api/og'
 export const countries = 'https://covid19.mathdro.id/api/countries'
 
 export const countryDetail = 'https://covid19.mathdro.id/api/countries/COUNTRY' // iso3 = NPL
-
-
-

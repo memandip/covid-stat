@@ -1,7 +1,7 @@
 import React from 'react'
-import {Spinner } from 'react-bootstrap'
+import { Spinner } from 'react-bootstrap'
 
-const Loader = () => (
+export default () => (
     <div className="preloader-overlay">
         <div className="preloader">
             <Spinner
@@ -15,5 +15,3 @@ const Loader = () => (
         </div>
   </div>
 )
-
-export default Loader
